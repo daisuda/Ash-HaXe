@@ -16,8 +16,6 @@ class NodeMacro
     {
         var nodeClass:ClassType = Context.getLocalClass().get();
         var fields:Array<Field> = Context.getBuildFields();
-		haxe.Log.trace( Context.getLocalVars() );
-
         var componentLinkFields:Array<Field> = [];
         for (field in fields)
         {
@@ -91,12 +89,18 @@ class NodeMacro
 							{
 								componentClassName += path.pack[i] + ".";
 							}
-							componentClassName += path.name;
+							switch( Context.getType(path.name) )
+							{
+								case TInst( t , _ ): componentClassName = t.toString();
+								case _:
+							}
+							//componentClassName += path.name;
 							var componentClassNameExpr = macro $v{componentClassName};
 /*                            var componentClassExpr = {
                                 expr: EConst(CIdent(path.name)),
                                 pos: field.pos
                             };*/
+							//haxe.Log.trace( componentClassExpr);
                             var componentFieldNameExpr = {
                                 expr: EConst(CString(field.name)),
                                 pos: field.pos
