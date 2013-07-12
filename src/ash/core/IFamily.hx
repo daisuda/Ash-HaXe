@@ -26,12 +26,12 @@ interface IFamily<TNode:Node<TNode>>
      * A component has been added to an entity. Test whether the entity's inclusion in this family's
      * NodeList should be modified.
      */
-    function componentAddedToEntity( entity:Entity, componentClass:Class<Dynamic> ):Void;
+    function componentAddedToEntity( entity:Entity, componentClassName:String ):Void;
     /**
      * A component has been removed from an entity. Test whether the entity's inclusion in this family's
      * NodeList should be modified.
      */
-    function componentRemovedFromEntity( entity:Entity, componentClass:Class<Dynamic> ):Void;
+    function componentRemovedFromEntity( entity:Entity, componentClassName:String ):Void;
     /**
      * The family is about to be discarded. Clean up all properties as necessary. Usually, you will
      * want to empty the NodeList at this time.

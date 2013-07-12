@@ -1,8 +1,10 @@
 package ash.core;
 
-import ash.ClassMap;
 import ash.signals.Signal0;
 import ash.signals.Signal1;
+import haxe.ds.ObjectMap;
+import haxe.ds.StringMap.StringMap;
+import ash.ClassMap;
 
 /**
  * The Engine class is the central point for creating and managing your game state. Add
@@ -16,7 +18,8 @@ class Engine
     private var entityNames:Map<String, Entity>;
     private var entityList:EntityList;
     private var systemList:SystemList;
-    private var families:ClassMap<Class<Dynamic>, IFamily<Dynamic>>;
+    private var families:ClassMap< Class<Dynamic>, IFamily<Dynamic> > ;
+
 
     /**
      * Indicates if the engine is currently in its update loop.
@@ -47,7 +50,7 @@ class Engine
         entityList = new EntityList();
         entityNames = new Map<String, Entity>();
         systemList = new SystemList();
-        families = new ClassMap();
+        families = new ClassMap < Class<Dynamic>, IFamily<Dynamic> > ();
         entityAdded = new Signal1<Entity>();
         entityRemoved = new Signal1<Entity>();
         updateComplete = new Signal0();
@@ -139,11 +142,11 @@ class Engine
      * @private
      */
 
-    private function componentAdded(entity:Entity, componentClass:Class<Dynamic>):Void
+    private function componentAdded(entity:Entity, componentClassName:String):Void
     {
         for (family in families)
         {
-            family.componentAddedToEntity(entity, componentClass);
+            family.componentAddedToEntity(entity, componentClassName);
         }
     }
 
@@ -151,11 +154,11 @@ class Engine
      * @private
      */
 
-    private function componentRemoved(entity:Entity, componentClass:Class<Dynamic>):Void
+    private function componentRemoved(entity:Entity, componentClassName:String):Void
     {
         for (family in families)
         {
-            family.componentRemovedFromEntity(entity, componentClass);
+            family.componentRemovedFromEntity(entity, componentClassName );
         }
     }
 

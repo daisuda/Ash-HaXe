@@ -1,9 +1,9 @@
 package ash.core;
 
+import haxe.Log;
 import haxe.macro.Context;
 import haxe.macro.Type;
 import haxe.macro.Expr;
-
 /**
  * This macro iterates over fields declared in Node subclasses and creates
  * a static function that returns a mapping from component classes to property names
@@ -11,10 +11,12 @@ import haxe.macro.Expr;
  **/
 class NodeMacro
 {
+	
     macro public static function build():Array<Field>
     {
         var nodeClass:ClassType = Context.getLocalClass().get();
         var fields:Array<Field> = Context.getBuildFields();
+		haxe.Log.trace( Context.getLocalVars() );
 
         var componentLinkFields:Array<Field> = [];
         for (field in fields)
@@ -44,24 +46,13 @@ class NodeMacro
         // Type path for ObjectMap<Class<Dynamic>, String>
         var componentsTypePath:TypePath =
         {
-            pack: ["ash"],
-            name: "ClassMap",
+            pack: ["haxe","ds"],
+            name: "StringMap",
             params: [
                 TPType(TPath({
                     pack: [],
-                    name: "Class",
-                    params: [
-                        TPType(TPath({
-                            pack: [],
-                            name: "Dynamic",
-                            params: []
-                        }))
-                    ]
-                })),
-                TPType(TPath({
-                    pack: [],
-                    name: "String",
-                    params: []
+                    name: "Dynamic",
+					params: []
                 }))
             ]
         }
@@ -91,14 +82,21 @@ class NodeMacro
         {
             switch (field.kind)
             {
-                case FVar(type, _):
+                case FVar(type, expr):
                     switch (type)
                     {
                         case TPath(path):
-                            var componentClassExpr = {
+							var componentClassName:String = "";
+							for ( i in 0...path.pack.length )
+							{
+								componentClassName += path.pack[i] + ".";
+							}
+							componentClassName += path.name;
+							var componentClassNameExpr = macro $v{componentClassName};
+/*                            var componentClassExpr = {
                                 expr: EConst(CIdent(path.name)),
                                 pos: field.pos
-                            };
+                            };*/
                             var componentFieldNameExpr = {
                                 expr: EConst(CString(field.name)),
                                 pos: field.pos
@@ -109,7 +107,7 @@ class NodeMacro
                                         expr: EField({expr: componentsRef, pos: field.pos}, "set"),
                                         pos: field.pos
                                     },
-                                    [componentClassExpr, componentFieldNameExpr]
+                                    [componentClassNameExpr, componentFieldNameExpr]
                                 ),
                                 pos: field.pos
                             });

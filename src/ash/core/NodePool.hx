@@ -1,4 +1,5 @@
 package ash.core;
+import haxe.ds.StringMap.StringMap;
 
 /**
  * This internal class maintains a pool of deleted nodes for reuse by the framework. This reduces the overhead
@@ -13,12 +14,12 @@ class NodePool<TNode:Node<TNode>>
     private var tail:TNode;
     private var nodeClass:Class<TNode>;
     private var cacheTail:TNode;
-    private var components:ClassMap<Class<Dynamic>, String>;
+    private var components:StringMap<String>;
 
     /**
      * Creates a pool for the given node class.
      */
-    public function new(nodeClass:Class<TNode>, components:ClassMap<Class<Dynamic>, String>)
+    public function new(nodeClass:Class<TNode>, components:StringMap<String>)
     {
         this.nodeClass = nodeClass;
         this.components = components;

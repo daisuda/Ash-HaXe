@@ -1,6 +1,5 @@
 package ash.core;
-
-import ash.ClassMap;
+import haxe.ds.StringMap.StringMap;
 
 /**
  * The default class for managing a NodeList. This class creates the NodeList and adds and removes
@@ -20,7 +19,7 @@ class ComponentMatchingFamily<TNode:Node<TNode>> implements IFamily<TNode>
 
     private var entities:Map<Entity, TNode>;
     private var nodeClass:Class<TNode>;
-    private var components:ClassMap<Class<Dynamic>, String>;
+    private var components:StringMap<String>;
     private var nodePool:NodePool<TNode>;
     private var engine:Engine;
 
@@ -69,7 +68,7 @@ class ComponentMatchingFamily<TNode:Node<TNode>> implements IFamily<TNode>
      * Called by the engine when a component has been added to an entity. We check if the entity is not in
      * this family's NodeList and should be, and add it if appropriate.
      */
-    public function componentAddedToEntity(entity:Entity, componentClass:Class<Dynamic>):Void
+    public function componentAddedToEntity(entity:Entity, componentClass:String):Void
     {
         addIfMatch(entity);
     }
@@ -79,9 +78,9 @@ class ComponentMatchingFamily<TNode:Node<TNode>> implements IFamily<TNode>
      * is required by this family's NodeList and if so, we check if the entity is in this this NodeList and
      * remove it if so.
      */
-    public function componentRemovedFromEntity(entity:Entity, componentClass:Class<Dynamic>):Void
+    public function componentRemovedFromEntity(entity:Entity, componentClassName:String):Void
     {
-        if (components.exists(componentClass))
+        if (components.exists(componentClassName))
         {
             removeIfMatch(entity);
         }
@@ -104,18 +103,18 @@ class ComponentMatchingFamily<TNode:Node<TNode>> implements IFamily<TNode>
     {
         if (!entities.exists(entity))
         {
-            for (componentClass in components.keys())
+            for (componentClassName in components.keys())
             {
-                if (!entity.has(componentClass))
+                if (!entity.components.exists(componentClassName))
                 {
                     return;
                 }
             }
             var node:TNode = nodePool.get();
             node.entity = entity;
-            for (componentClass in components.keys())
+            for (componentClassName in components.keys())
             {
-                Reflect.setField(node, components.get(componentClass), entity.get(componentClass));
+                Reflect.setField(node, components.get(componentClassName), entity.components.get(componentClassName));
             }
             entities.set(entity, node);
             nodeList.add(node);

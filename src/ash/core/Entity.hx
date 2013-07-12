@@ -1,7 +1,10 @@
 package ash.core;
 
-import ash.ClassMap;
 import ash.signals.Signal2;
+import haxe.ds.StringMap.StringMap;
+import haxe.Log;
+import haxe.macro.Context;
+import haxe.macro.Expr;
 
 /**
  * An entity is composed from components. As such, it is essentially a collection object for components.
@@ -32,11 +35,11 @@ class Entity
     /**
      * This signal is dispatched when a component is added to the entity.
      */
-    public var componentAdded(default, null):Signal2<Entity, Class<Dynamic>>;
+    public var componentAdded(default, null):Signal2<Entity, String>;
     /**
      * This signal is dispatched when a component is removed from the entity.
      */
-    public var componentRemoved(default, null):Signal2<Entity, Class<Dynamic>>;
+    public var componentRemoved(default, null):Signal2<Entity, String>;
     /**
      * Dispatched when the name of the entity changes. Used internally by the engine to track entities based on their names.
      */
@@ -44,14 +47,14 @@ class Entity
 
     public var previous:Entity;
     public var next:Entity;
-    public var components(default, null):ClassMap<Class<Dynamic>, Dynamic>;
+    public var components(default, null):StringMap<Dynamic>;
 
     public function new(name:String = "")
     {
-        componentAdded = new Signal2<Entity, Class<Dynamic>>();
-        componentRemoved = new Signal2<Entity, Class<Dynamic>>();
+        componentAdded = new Signal2<Entity, String>();
+        componentRemoved = new Signal2<Entity, String>();
         nameChanged = new Signal2<Entity, String>();
-        components = new ClassMap();
+        components = new StringMap();
 
         if (name != "")
             this.name = name;
@@ -86,16 +89,18 @@ class Entity
      *     .add(new Display(new PlayerClip());</code>
      */
 
-    public function add<T>(component:T, componentClass:Class<Dynamic> = null):Entity
+    public function add<T>(component:T, ?componentClass:Class<T>):Entity
     {
         if (componentClass == null)
             componentClass = Type.getClass(component);
 
-        if (components.exists(componentClass))
-            remove(componentClass);
+		var componentClassName:String = Type.getClassName( componentClass );
+		Log.trace(componentClassName);
+        if (components.exists(componentClassName))
+            remove_(componentClassName);
 
-        components.set(componentClass, component);
-        componentAdded.dispatch(this, componentClass);
+        components.set(componentClassName , component);
+        componentAdded.dispatch(this, componentClassName);
         return this;
     }
 
@@ -106,18 +111,33 @@ class Entity
      * @return the component, or null if the component doesn't exist in the entity
      */
 
-    public function remove<T>(componentClass:Class<Dynamic>):T
-    {
-        var component:T = components.get(componentClass);
+	 public function remove_(componentClassName:String)
+	 {
+		var component = components.get(componentClassName);
         if (component != null)
         {
-            components.remove(componentClass);
-            componentRemoved.dispatch(this, componentClass);
-            return component;
+            components.remove(componentClassName);
+            componentRemoved.dispatch(this, componentClassName );
         }
-        return null;
-    }
+		return component;
+	 }
+	 
+    macro public function remove<T>( self:ExprOf<Entity>  , componentClass:ExprOf<Class<T>>):Expr
+    {
+		var componentClassName:String;
+		switch(Context.typeof( componentClass ))
+		{
+			case TType( t, _):componentClassName = t.toString();
+			var arr:Array<String> = componentClassName.split("#");
+			componentClassName = arr[0] + arr[1];
+			case _:
+				
+		}
+		return macro {
+			$self.remove_($v { componentClassName } );
 
+        }
+	}
     /**
      * Get a component from the entity.
      *
@@ -125,9 +145,19 @@ class Entity
      * @return The component, or null if none was found.
      */
 
-    public function get<T>(componentClass:Class<Dynamic>):T
+    macro public function get<T>( self:ExprOf<Entity>  , componentClass:ExprOf<Class<T>>):Expr
     {
-        return components.get(componentClass);
+		var componentClassName:String;
+		switch(Context.typeof( componentClass ))
+		{
+			case TType( t, _):componentClassName = t.toString();
+			var arr:Array<String> = componentClassName.split("#");
+			componentClassName = arr[0] + arr[1];
+			case _:
+				
+		}
+		
+        return macro $self.components.get($v{componentClassName});
     }
 
     /**
@@ -151,8 +181,18 @@ class Entity
      * @return true if the entity has a component of the type, false if not.
      */
 
-    public function has(componentClass:Class<Dynamic>):Bool
+    macro public function has<T>( self:ExprOf<Entity> ,  componentClass:ExprOf<Class<Dynamic>>):Expr
     {
-        return components.exists(componentClass);
+		var componentClassName:String;
+		switch(Context.typeof( componentClass ))
+		{
+			case TType( t, _):componentClassName = t.toString();
+			var arr:Array<String> = componentClassName.split("#");
+			componentClassName = arr[0] + arr[1];
+			case _:
+				
+		}
+		
+        return macro $self.components.exists($v{componentClassName});
     }
 }
