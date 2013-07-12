@@ -79,7 +79,7 @@ class EntityTest extends MatchersBase
     {
         var component:MockComponentExtended = new MockComponentExtended();
         entity.add(component, MockComponent);
-        assertThat(entity.get(MockComponent), sameInstance(component));
+        assertThat(entity.get(MockComponentExtended), sameInstance(component));
     }
 
     @Test
@@ -163,10 +163,10 @@ class EntityTest extends MatchersBase
         entity.remove(MockComponent);
     }
 
-    private function testSignalContent(signalEntity:Entity, componentClass:Class<Dynamic>):Void
+    private function testSignalContent(signalEntity:Entity, componentClassName:String):Void
     {
         assertThat(signalEntity, sameInstance(entity));
-        assertThat(componentClass, sameInstance(MockComponent));
+        assertThat(Type.resolveClass(componentClassName), sameInstance(MockComponent));
     }
 
     @Test

@@ -71,7 +71,7 @@ class ComponentMatchingFamilyTest extends MatchersBase
         var nodes = family.nodeList;
         var entity:Entity = new Entity();
         entity.add(new Point());
-        family.componentAddedToEntity(entity, Point);
+        family.componentAddedToEntity(entity, Type.getClassName(Point));
         assertThat(nodes.head.entity, sameInstance(entity));
     }
 
@@ -89,7 +89,7 @@ class ComponentMatchingFamilyTest extends MatchersBase
     {
         var entity:Entity = new Entity();
         entity.add(new Matrix());
-        family.componentAddedToEntity(entity, Matrix);
+        family.componentAddedToEntity(entity, Type.getClassName(Matrix));
         var nodes = family.nodeList;
         assertThat(nodes.head, nullValue());
     }
@@ -123,7 +123,7 @@ class ComponentMatchingFamilyTest extends MatchersBase
         entity.add(new Point());
         family.newEntity(entity);
         entity.remove(Point);
-        family.componentRemovedFromEntity(entity, Point);
+        family.componentRemovedFromEntity(entity, Type.getClassName(Point));
         var nodes = family.nodeList;
         assertThat(nodes.head, nullValue());
     }

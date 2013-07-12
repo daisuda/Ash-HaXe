@@ -216,12 +216,12 @@ class MockFamily<T:Node<T>> implements IFamily<T>
         removeEntityCalls++;
     }
 
-    public function componentAddedToEntity(entity:Entity, componentClass:Class<Dynamic>):Void
+    public function componentAddedToEntity(entity:Entity, componentClassName:String):Void
     {
         componentAddedCalls++;
     }
 
-    public function componentRemovedFromEntity(entity:Entity, componentClass:Class<Dynamic>):Void
+    public function componentRemovedFromEntity(entity:Entity, componentClassName:String):Void
     {
         componentRemovedCalls++;
     }
