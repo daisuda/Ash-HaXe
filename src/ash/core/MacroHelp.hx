@@ -16,7 +16,6 @@ class MacroHelp
 	
 	macro public static function getClassNameString<T>( componentClass:ExprOf<Class<T>>):ExprOf<String>
 	{
-		haxe.Log.trace( Context.typeof(componentClass) );
 		var className:String;
 		switch( Context.typeof(componentClass) )
 		{
@@ -26,7 +25,6 @@ class MacroHelp
 			}
 			case _:
 		}
-		Context.warning(className, Context.currentPos());
 		return macro $v{className};
 	}
 	

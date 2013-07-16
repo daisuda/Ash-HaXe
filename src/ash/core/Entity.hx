@@ -95,7 +95,6 @@ class Entity
             componentClass = Type.getClass(component);
 
 		var componentClassName:String = Type.getClassName( componentClass );
-		Log.trace(componentClassName);
         if (components.exists(componentClassName))
             remove_(componentClassName);
 

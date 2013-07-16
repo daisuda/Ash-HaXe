@@ -100,7 +100,6 @@ class NodeMacro
                                 expr: EConst(CIdent(path.name)),
                                 pos: field.pos
                             };*/
-							//haxe.Log.trace( componentClassExpr);
                             var componentFieldNameExpr = {
                                 expr: EConst(CString(field.name)),
                                 pos: field.pos
